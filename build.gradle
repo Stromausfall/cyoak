@@ -1,0 +1,67 @@
+String BUILD_FOLDER = 'build'
+String BIN_FOLDER = 'bin'
+String MAIN_CLASS = 'net.matthiasauer.cyoak.Main'
+String NAME = 'cyoak'
+String NEKO_TEST_FILE = BUILD_FOLDER + '/' + NAME + '_test.n'
+String NEKO_FILE = BUILD_FOLDER + '/' + NAME + '.n'
+String NEKO_FILE_IN_BIN_FOLDER = BIN_FOLDER + '/' + NAME + '.n'
+
+task deleteFolders(type: Delete) {
+	description 'deletes the folders for the binary and build files'
+	group 'cyaok'
+	
+	delete 'build', 'bin'
+}
+
+List<String> createBuildCommand(String file, String mainClass, Collection<String> sourceFolders) {
+	List<String> classPaths = sourceFolders.collect([]) { ['-cp', it] }
+	List<String> libs = ['markdown'].collect([]) { ['-lib', it] }
+	
+	return ['haxe', classPaths, '-neko', file, '-main', mainClass, libs].flatten()
+}
+
+task buildTestNeko(type: Exec) {
+	description 'builds a neko file that contains the source + tests'
+	dependsOn deleteFolders
+	
+	commandLine ( createBuildCommand(NEKO_TEST_FILE, 'net.matthiasauer.cyoak.TestMain', ['src', 'test']) )
+}
+
+task buildNeko(type: Exec) {
+	description 'builds a neko file that contains the source'
+	dependsOn deleteFolders
+	
+	commandLine ( createBuildCommand(NEKO_FILE, 'net.matthiasauer.cyoak.Main', ['src']) )
+}
+
+task runTests(type: Exec) {
+	description 'builds and runs the tests'
+	dependsOn buildTestNeko	
+	group 'cyaok'
+	
+	commandLine( ['neko', NEKO_TEST_FILE] )
+}
+
+task copyFilesForPackaging(type: Copy) {
+	description 'copies the neko file to the bin folder'
+	dependsOn buildNeko
+	
+    from NEKO_FILE
+    into BIN_FOLDER
+}
+
+task removeNekoFileFromBinFolder(type: Delete) {
+	description 'deletes the now unnecessary neko file from the bin folder'
+	
+	delete NEKO_FILE_IN_BIN_FOLDER
+}
+
+task packageExecutable(type: Exec) {
+	description 'builds and packages to an executable'
+	dependsOn copyFilesForPackaging
+	finalizedBy removeNekoFileFromBinFolder
+	group 'cyaok'
+	
+	commandLine ( ['nekotools', 'boot', NEKO_FILE_IN_BIN_FOLDER] )
+}
+
