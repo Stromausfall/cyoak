@@ -5,6 +5,7 @@ String NAME = 'cyoak'
 String NEKO_TEST_FILE = BUILD_FOLDER + '/' + NAME + '_test.n'
 String NEKO_FILE = BUILD_FOLDER + '/' + NAME + '.n'
 String NEKO_FILE_IN_BIN_FOLDER = BIN_FOLDER + '/' + NAME + '.n'
+project.ext.set('LIBRARIES', ['markdown', 'mockatoo'])
 
 task deleteFolders(type: Delete) {
 	description 'deletes the folders for the binary and build files'
@@ -15,14 +16,27 @@ task deleteFolders(type: Delete) {
 
 List<String> createBuildCommand(String file, String mainClass, Collection<String> sourceFolders) {
 	List<String> classPaths = sourceFolders.collect([]) { ['-cp', it] }
-	List<String> libs = ['markdown'].collect([]) { ['-lib', it] }
+	List<String> libs = LIBRARIES.collect([]) { ['-lib', it] }
 	
 	return ['haxe', classPaths, '-neko', file, '-main', mainClass, libs].flatten()
+}
+
+task downloadLibraries {
+	description 'downloads and installs all libraries'
+	
+	LIBRARIES.each { lib ->
+		doLast {
+			exec {
+				commandLine ( ['haxelib', 'install', lib] )
+			}
+		}
+	}
 }
 
 task buildTestNeko(type: Exec) {
 	description 'builds a neko file that contains the source + tests'
 	dependsOn deleteFolders
+	dependsOn downloadLibraries
 	
 	commandLine ( createBuildCommand(NEKO_TEST_FILE, 'net.matthiasauer.cyoak.TestMain', ['src', 'test']) )
 }
@@ -30,6 +44,7 @@ task buildTestNeko(type: Exec) {
 task buildNeko(type: Exec) {
 	description 'builds a neko file that contains the source'
 	dependsOn deleteFolders
+	dependsOn downloadLibraries
 	
 	commandLine ( createBuildCommand(NEKO_FILE, 'net.matthiasauer.cyoak.Main', ['src']) )
 }
