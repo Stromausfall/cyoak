@@ -1,6 +1,7 @@
 package net.matthiasauer.cyoak;
 
 import neko.Lib;
+import net.matthiasauer.cyoak.helper.HelperTest;
 
 /**
  * ...
@@ -11,12 +12,10 @@ class TestMain
 	
 	static function main() 
 	{
-		Main.main();
-		
 		Lib.println('asdf2\n');
-		var r = new haxe.unit.TestRunner();
+		var r:haxe.unit.TestRunner = new haxe.unit.TestRunner();
 		
-		//r.add(new SystemForMocksTest());
+		r.add(new HelperTest());
 		
 		r.run();
 	}

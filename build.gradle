@@ -1,5 +1,7 @@
 String BUILD_FOLDER = 'build'
-String BIN_FOLDER = 'bin'
+String BIN_FOLDER = 'build'
+String SOURCE_FOLDER = 'src/main/haxe'
+String TEST_FOLDER = 'src/test/haxe'
 String NEKO_TEST_FILE = BUILD_FOLDER + '/' + NAME + '_test.n'
 String NEKO_FILE = BUILD_FOLDER + '/' + NAME + '.n'
 String NEKO_FILE_IN_BIN_FOLDER = BIN_FOLDER + '/' + NAME + '.n'
@@ -35,7 +37,7 @@ task buildTestNeko(type: Exec) {
 	dependsOn deleteFolders
 	dependsOn downloadLibraries
 	
-	commandLine ( createBuildCommand(NEKO_TEST_FILE, 'net.matthiasauer.cyoak.TestMain', ['src', 'test']) )
+	commandLine ( createBuildCommand(NEKO_TEST_FILE, TEST_MAIN_CLASS, [SOURCE_FOLDER, TEST_FOLDER]) )
 }
 
 task buildNeko(type: Exec) {
@@ -43,7 +45,7 @@ task buildNeko(type: Exec) {
 	dependsOn deleteFolders
 	dependsOn downloadLibraries
 	
-	commandLine ( createBuildCommand(NEKO_FILE, 'net.matthiasauer.cyoak.Main', ['src']) )
+	commandLine ( createBuildCommand(NEKO_FILE, MAIN_CLASS, [SOURCE_FOLDER]) )
 }
 
 task runTests(type: Exec) {
@@ -76,4 +78,3 @@ task packageExecutable(type: Exec) {
 	
 	commandLine ( ['nekotools', 'boot', NEKO_FILE_IN_BIN_FOLDER] )
 }
-
