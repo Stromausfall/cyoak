@@ -78,3 +78,11 @@ task packageExecutable(type: Exec) {
 	
 	commandLine ( ['nekotools', 'boot', NEKO_FILE_IN_BIN_FOLDER] )
 }
+
+task debug(type: Exec) {
+	description 'starts html5 in debug mode (use F12 in Chrome and set a breakpoint in the haxe script)'
+	dependsOn downloadLibraries
+	group NAME
+
+	commandLine ( ['openfl', 'test', 'html5', '-debug'] )
+}

@@ -1,18 +1,13 @@
 package net.matthiasauer.cyoak;
 
-import neko.Lib;
+import flixel.FlxGame;
+import openfl.display.Sprite;
 
-/**
- * ...
- * @author
- */
-class Main
+class Main extends Sprite
 {
-
-	public static function main()
+	public function new()
 	{
-		Lib.println('asdf\n');
-		Lib.println( ' asdf' );
+		super();
+		addChild(new FlxGame(0, 0, PlayState));
 	}
-
 }

@@ -6,7 +6,7 @@
 	
 	<source path="src/main/haxe" />
 	
-	<haxelib name="openfl" />
+	<haxelib name="flixel" />
 	
 	<assets path="src/main/resources" rename="assets" />
 	
